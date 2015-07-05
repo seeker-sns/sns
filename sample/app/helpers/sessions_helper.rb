@@ -1,3 +1,5 @@
+# coding: utf-8
+# @author (2015-07-04) Yuuya Miyamae
 module SessionsHelper
 
   # サインイン
@@ -24,7 +26,7 @@ module SessionsHelper
     # ||= 今回、@current_userがあればそれを渡し、なければUser.find_byを渡す
   end
 
-  # サインインしているかの値を返す
+  # サインインしているかの値を返す
   def current_user?(user)
     user == current_user
   end
