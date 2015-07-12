@@ -1,8 +1,10 @@
 class User < ActiveRecord::Base
   has_secure_password
-
   before_save{ self.email = email.downcase}
   before_create :create_remember_token
+
+  has_many :microposts,dependent: :destroy
+
   validates :name,presence: true,length: {maximum: 50}
   VALID_EMAIL_REGEX = /\A[\w+\-]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email,presence: true,
@@ -13,14 +15,22 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password,
                             if: lambda{|m| m.password.present?}
 
+  # 64文字の乱数をセット
   def self.new_remember_token
     SecureRandom.urlsafe_base64
   end
+  # 変数tokenを暗号化
   def self.encrypt(token)
     Digest::SHA1.hexdigest(token.to_s)
   end
 
+  # フィード 自分のmicropostを取得する
+  def feed
+    Micropost.where("user_id = ?",id)
+  end
+
   private
+    # 生成した乱数を暗号化に直しセット
     def create_remember_token
       self.remember_token = User.encrypt(User.new_remember_token)
     end

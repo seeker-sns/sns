@@ -7,6 +7,7 @@ class UsersController < ApplicationController
   end
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page])
   end
 
   def new
@@ -42,7 +43,6 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
-
   private
 
   def user_params
@@ -50,14 +50,7 @@ class UsersController < ApplicationController
                                  :password_confirmation)
   end
 
-  # Before actions
-  def signed_in_user
-    unless signed_in?
-      store_location
-      redirect_to signin_url,notice: "Please sign in."
-    end
-  end
-
+  # 編集,更新する前にそのユーザーであるかの確認
   def correct_user
     @user = User.find(params[:id])
     redirect_to(root_path) unless current_user?(@user)
